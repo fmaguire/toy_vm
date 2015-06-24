@@ -7,8 +7,23 @@ typedef enum {
     ADD,
     POP,
     SET,
+    RET,
     HLT
 } InstructionSet;
+
+typedef enum {
+    A,
+    B,
+    C,
+    D,
+    E,
+    F,
+    NUM_OF_REGISTERS
+} Registers;
+
+int registers[NUM_OF_REGISTERS];
+
+
 
 // Simple program adding two numbers in stack
 // implemented as an array to be iterated over
@@ -17,6 +32,8 @@ const int program[] = {
     PSH, 2,
     ADD,
     POP,
+    SET, B, 5,
+    RET, B,
     HLT
 };
 
@@ -45,7 +62,7 @@ void eval(int instr) {
         }
         case POP: {
             int val_popped = stack[sp--];
-            printf("popped %d\n", val_popped);
+            printf("Popped %d\n", val_popped);
             break;
         }
         case ADD: {
@@ -54,6 +71,18 @@ void eval(int instr) {
             int result = a+b;
             sp++;
             stack[sp] = result;
+            break;
+        }
+        case SET: {
+            int reg = program[++ip];
+            int val = program[++ip];
+            registers[reg] = val;
+            break;
+        }
+        case RET: {
+            int reg = program[++ip];
+            int val_ret = registers[reg];
+            printf("Retrieved %d from reg %d\n", val_ret, reg);
             break;
         }
     }
