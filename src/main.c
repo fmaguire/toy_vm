@@ -41,9 +41,11 @@ const int program[] = {
 int ip = 0;
 int sp = -1;
 int stack[256];
+int stacksize = sizeof(stack)/sizeof(int);
 
 // Preventing infinite loop running
 bool running = true;
+bool crash = false;
 
 int fetch(){
     return program[ip];
@@ -57,10 +59,20 @@ void eval(int instr) {
         }
         case PSH: {
             sp++;
+            if (sp > stacksize){
+                crash = true;
+                printf("Stack overflow\n");
+                break;
+            }
             stack[sp] = program[++ip];
             break;
         }
         case POP: {
+            if (sp < 0) {
+                crash = true;
+                printf("Stack underflow\n");
+                break;
+            }
             int val_popped = stack[sp--];
             printf("Popped %d\n", val_popped);
             break;
@@ -89,7 +101,7 @@ void eval(int instr) {
 }
 
 int main() {
-    while(running) {
+    while(running && !crash) {
         eval(fetch());
         ip++;
     }
